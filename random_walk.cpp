@@ -40,7 +40,7 @@ int main()
 
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
-    std::uniform_int_distribution<> distr_index(0, 5-1); // define the range
+    std::uniform_int_distribution<> distr_index(0, DIMENSION-1); // define the range
 
 
     vector<int> current_point;
@@ -86,7 +86,7 @@ int main()
                 step = -1;
             }
 
-            current_point[distr_index(gen)/2]+=step;
+            current_point[distr_index(gen)]+=step;
 
             bool went_back_to_start = true;
             for(int k=0;  k < DIMENSION; ++k){
