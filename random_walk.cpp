@@ -43,14 +43,17 @@ int main()
     std::uniform_int_distribution<> distr_index(0, DIMENSION-1); // define the range
 
 
+    //fill the vector with the dimension
     vector<int> current_point;
     for(int i=0;  i < DIMENSION; ++i){
         current_point.push_back(0);
     }
 
+    //to print overall progress
     int step = 2;
     int nextPrint = step;
 
+    //counters
     int went_back_to_start_count = 0;
     int failure_count = 0;
     for(int i=0;  i < NUMBER_OF_TRY; ++i){
@@ -62,10 +65,13 @@ int main()
             std::cout.flush();
             nextPrint += step;
         }
-        //reset starting point
+
+        //reset starting point to zero
         for(int j=0;  j < DIMENSION; ++j){
             current_point[j]=0;
         }
+
+        //to print each walk progress
         int walk_step = 1;
         int walk_nextPrint = walk_step;
         //random walk
@@ -79,6 +85,7 @@ int main()
                 walk_nextPrint += walk_step;
             }
 
+            //go +1 or -1 ?
             int step = 0;
             if (std::rand() % 2 == 0){
                 step = 1;
@@ -86,8 +93,10 @@ int main()
                 step = -1;
             }
 
+            //go +1 or -1 on a rdm direction
             current_point[distr_index(gen)]+=step;
 
+            //did we went back to zero ?
             bool went_back_to_start = true;
             for(int k=0;  k < DIMENSION; ++k){
                 if(current_point[k]!=0){
@@ -95,16 +104,18 @@ int main()
                     break;
                 }
             }
+
             if (went_back_to_start) {
-                //cout << " went_back_to_start loop " << i << " after " << j+1 << " steps " << endl;
+                cout << " went_back_to_start loop " << i << " after " << j+1 << " steps " << endl;
                 went_back_to_start_count++;
                 break;
             }else if (j==MAX_TRY_BEFORE_GIVEUP-1){
                 failure_count++;
-                //cout << " FAILED " << i << " ";
-                //print_point(current_point);
+                cout << " FAILED " << i << " ";
+                print_point(current_point);
             }
-            /*else if (no_need_to_to_continue(current_point, j, MAX_TRY_BEFORE_GIVEUP)){
+            /*stop if we cannot go back but too time consuming
+            else if (no_need_to_to_continue(current_point, j, MAX_TRY_BEFORE_GIVEUP)){
                 break;
             }*/
         }
