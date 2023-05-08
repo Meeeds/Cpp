@@ -46,11 +46,11 @@ int main()
     unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();
     //int MAX_TRY_BEFORE_GIVEUP = 10000;
     int DIMENSION = 3;
-    int NUMBER_OF_TRY = 1000;
+    int NUMBER_OF_RDM_WALKS = 1000;
     int MODULO = 3;
     cout << "MAX_TRY_BEFORE_GIVEUP=" << MAX_TRY_BEFORE_GIVEUP << endl;
     cout << "DIMENSION=" << DIMENSION << endl;
-    cout << "NUMBER_OF_TRY=" << NUMBER_OF_TRY << endl;
+    cout << "NUMBER_OF_RDM_WALKS=" << NUMBER_OF_RDM_WALKS << endl;
     cout << "MODULO=" << MODULO << endl;
 
     std::random_device rd; // obtain a random number from hardware
@@ -60,7 +60,7 @@ int main()
 
     //fill the vector with the dimension size and number of try
     vector<Points> global_vector;
-    for(int i=0;  i < NUMBER_OF_TRY; ++i){
+    for(int i=0;  i < NUMBER_OF_RDM_WALKS; ++i){
         global_vector.push_back(Points(DIMENSION));
     }
 
@@ -77,7 +77,7 @@ int main()
         double percent = 100*( (double) i / MAX_TRY_BEFORE_GIVEUP);
         if (percent >= nextPrint)
         {
-            float failures = (100.0 * global_vector.size() ) / NUMBER_OF_TRY;
+            float failures = (100.0 * global_vector.size() ) / NUMBER_OF_RDM_WALKS;
             std::cout << "FAILURES " << std::fixed << setprecision(2) << failures << "%" 
                 << " Global progress:  " << setfill(' ') << setw(2) << percent << "%" << " steps done: " << i << endl;
             std::cout.flush();
