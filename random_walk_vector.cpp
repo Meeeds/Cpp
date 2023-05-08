@@ -9,19 +9,6 @@
 using namespace std;
 
 
-
-bool no_need_to_to_continue(vector<int> current_point, int index, int maxIndex) {
-    int total = 0;
-    for(int val : current_point){
-        total+=std::abs(val);
-    }
-    if (total > (maxIndex-index) ){
-        cout << " no_need_to_to_continue(" << maxIndex-index << ")" << " total=" << total << endl;
-        return true;
-    }
-    return false;
-}
-
 class Points {
     public : 
 
@@ -71,8 +58,7 @@ int main()
     std::uniform_int_distribution<> distr_index(0, DIMENSION-1); // define the range
 
 
-    //fill the vector with the dimension size number of try
-
+    //fill the vector with the dimension size and number of try
     vector<Points> global_vector;
     for(int i=0;  i < NUMBER_OF_TRY; ++i){
         global_vector.push_back(Points(DIMENSION));
@@ -119,6 +105,7 @@ int main()
                 it->_current_point[random_index] = (it->_current_point[random_index] + MODULO ) % MODULO;
             }
 
+            //erase the point if it went back to zero
             if(it->is_zero()){
                 std::cout << "i = " << i << " going to erase ";
                 it->print_point();
