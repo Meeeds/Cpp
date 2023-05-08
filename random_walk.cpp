@@ -3,6 +3,8 @@
 #include <string>
 #include <random>
 #include <limits>
+#include <algorithm>
+
 
 using namespace std;
 
@@ -31,12 +33,14 @@ bool no_need_to_to_continue(vector<int> current_point, int index, int maxIndex) 
 int main()
 {
     //int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<int>::max();
-    int MAX_TRY_BEFORE_GIVEUP = 1000000;
+    int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<int>::max();;
     int DIMENSION = 3;
-    int NUMBER_OF_TRY = 10000;
-    cout << "aMAX_TRY_BEFORE_GIVEUP=" << MAX_TRY_BEFORE_GIVEUP << endl;
+    int NUMBER_OF_TRY = 1000;
+    int MODULO = 3;
+    cout << "MAX_TRY_BEFORE_GIVEUP=" << MAX_TRY_BEFORE_GIVEUP << endl;
     cout << "DIMENSION=" << DIMENSION << endl;
     cout << "NUMBER_OF_TRY=" << NUMBER_OF_TRY << endl;
+    cout << "MODULO=" << MODULO << endl;
 
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
@@ -56,6 +60,8 @@ int main()
     //counters
     int went_back_to_start_count = 0;
     int failure_count = 0;
+    int max_steps_before_going_back = 0;
+    vector<int> steps_it_failed;
     for(int i=0;  i < NUMBER_OF_TRY; ++i){
         
         int percent = (100 * i) / NUMBER_OF_TRY;
@@ -80,21 +86,25 @@ int main()
             int walk_percent = 100*( (float) j / MAX_TRY_BEFORE_GIVEUP);
             if (walk_percent >= walk_nextPrint)
             {
-                //std::cout << "\rWalk: " << std::string(walk_percent/5, '|') << walk_percent << "%";
+                std::cout << "\rWalk: " << std::string(walk_percent/5, '|') << walk_percent << "%";
                 std::cout.flush();
                 walk_nextPrint += walk_step;
             }
 
             //go +1 or -1 ?
-            int step = 0;
+            int aStep = 0;
             if (std::rand() % 2 == 0){
-                step = 1;
+                aStep = 1;
             }else{
-                step = -1;
+                aStep = -1;
             }
 
             //go +1 or -1 on a rdm direction
-            current_point[distr_index(gen)]+=step;
+            int random_index = distr_index(gen);
+            current_point[random_index] += aStep;
+            if ( MODULO > 0 && random_index == (DIMENSION-1)) {
+                current_point[random_index] = (current_point[random_index] + MODULO ) % MODULO;
+            }
 
             //did we went back to zero ?
             bool went_back_to_start = true;
@@ -108,6 +118,10 @@ int main()
             if (went_back_to_start) {
                 cout << " went_back_to_start loop " << i << " after " << j+1 << " steps " << endl;
                 went_back_to_start_count++;
+                steps_it_failed.push_back(j+1);
+                if (j+1 > max_steps_before_going_back){
+                    max_steps_before_going_back = j+1;
+                }
                 break;
             }else if (j==MAX_TRY_BEFORE_GIVEUP-1){
                 failure_count++;
@@ -121,6 +135,13 @@ int main()
         }
     }
 
+    std::sort (steps_it_failed.begin(), steps_it_failed.end());
     std::cout << "went_back_to_start_count " << went_back_to_start_count << endl;
     std::cout << "failure_count " << failure_count << endl;
+    std::cout << "max_steps_before_going_back " << max_steps_before_going_back << endl;
+    cout << "steps_it_failed = [ ";
+    for (auto const &here: steps_it_failed) {
+        cout << here << ", ";
+    }
+    cout << " ]" << endl;
 }
