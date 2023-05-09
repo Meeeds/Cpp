@@ -67,11 +67,6 @@ int main()
     cout << "NUMBER_OF_RDM_WALKS=" << NUMBER_OF_RDM_WALKS << endl;
     cout << "MODULO=" << MODULO << endl;
 
-    std::random_device rd; // obtain a random number from hardware
-    std::mt19937 gen(rd()); // seed the generator
-    std::uniform_int_distribution<> distr_index(0, DIMENSION-1); // define the range
-
-
     //fill the vector with the dimension size and number of try
     vector<Points> global_vector;
     for(int i=0;  i < NUMBER_OF_RDM_WALKS; ++i){
@@ -129,9 +124,10 @@ int main()
                         cout << 100.0 * (1.0 * walk_number2) / MAX_TRY_BEFORE_GIVEUP << endl;
                         return 0;
                     }
-                    
-                    it->print_point();
-                    cout << " " << walk_number2 << endl;
+                    if (walk_number2 % 99 == 0){
+                        it->print_point();
+                        cout << " " << walk_number2 << endl;
+                    }
                 }
                 cout << "FAILED NEW";
             }
@@ -145,7 +141,7 @@ int main()
 
             //go +1 or -1 on a rdm direction
             
-            unsigned int random_index = distr_index(gen);
+            const unsigned int random_index = 0;
             //unsigned int random_index = (std::rand() % 2);
 
             it->_current_point[0] += aStep;
@@ -157,7 +153,7 @@ int main()
             //erase the point if it went back to zero
             if(it->is_zero()){
                 //std::cout << "i = " << i << " going to erase "; it->print_point();
-                global_vector.erase(it);
+                it = global_vector.erase(it);
                 went_back_to_start_count++;
                 if (walk_number + 1 > max_steps_before_going_back){
                     max_steps_before_going_back = walk_number + 1;
