@@ -30,26 +30,40 @@ class Points {
         return true;
     }
 
-    void print_point() {
-        cout << "_current_point=" ; 
+    void print_point() const {
+        cout << "(" ; 
         for(int l=0;  l < _current_point.size(); ++l){
-            cout << _current_point[l] << ", " ;
+            cout << _current_point[l] ;
+            if(l!=_current_point.size()-1){
+               cout << "," ;
+            }
         }
-        cout << endl;
+        cout << ")" ; 
     }
 
     vector<int> _current_point;
 };
 
+void print_global_vector(const vector<Points>& aGlobal_vector ){
+    std::cout << "global_vector[" << aGlobal_vector.size() << "] = [";
+    for (auto it = aGlobal_vector.begin(); it != aGlobal_vector.end(); ++it ){
+        it->print_point();
+    }
+    cout << "]" << endl;
+}
+
 int main()
 {
     unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();
     //int MAX_TRY_BEFORE_GIVEUP = 10000;
-    int DIMENSION = 3;
+    int DIMENSION = 1;
     int NUMBER_OF_RDM_WALKS = 1000;
-    int MODULO = 3;
+    int MODULO = 0;
+
+    std::srand(std::time(nullptr)); 
+
     cout << "MAX_TRY_BEFORE_GIVEUP=" << MAX_TRY_BEFORE_GIVEUP << endl;
-    cout << "DIMENSION=" << DIMENSION << endl;
+    cout << "DIMENSION=" << DIMENSION << endl; 
     cout << "NUMBER_OF_RDM_WALKS=" << NUMBER_OF_RDM_WALKS << endl;
     cout << "MODULO=" << MODULO << endl;
 
@@ -72,48 +86,86 @@ int main()
     int went_back_to_start_count = 0;
     int failure_count = 0;
     int max_steps_before_going_back = 0;
-    for(unsigned int i=0;  i < MAX_TRY_BEFORE_GIVEUP; ++i){
+    for(unsigned int walk_number=0;  walk_number < MAX_TRY_BEFORE_GIVEUP; ++walk_number){
         
-        double percent = 100*( (double) i / MAX_TRY_BEFORE_GIVEUP);
+        double percent = 100*( (double) walk_number / MAX_TRY_BEFORE_GIVEUP);
         if (percent >= nextPrint)
         {
             float failures = (100.0 * global_vector.size() ) / NUMBER_OF_RDM_WALKS;
             std::cout << "FAILURES " << std::fixed << setprecision(2) << failures << "%" 
-                << " Global progress:  " << setfill(' ') << setw(2) << percent << "%" << " steps done: " << i << endl;
-            std::cout.flush();
+                << " Global progress:  " << setfill(' ') << setw(2) << percent << "%" << " steps done: " << walk_number << endl;
+            print_global_vector(global_vector);
             if(nextPrint>2){
                 nextPrint += 10*step;
             }else{
                 nextPrint += step;
             }
         }
+
+        //print_global_vector(global_vector);
+
         //go one step for each point in the global vector
-        for (auto it = global_vector.begin(); it != global_vector.end(); ){
-            
+        int keep_index = 0;
+        if(global_vector.size()==0){
+            break;
+        }
+        for (auto it = global_vector.begin(); it != global_vector.end(); ){           
             //go +1 or -1 ?
+
+            if(percent > 50){
+                it->print_point();
+                cout << "still not at zero ? try something else" << endl;
+                unsigned int walk_number2=0;
+                for(walk_number2=0;  walk_number2 < MAX_TRY_BEFORE_GIVEUP; ++walk_number2){
+                    int aStep2 = 0;
+                    if ( (std::rand() % 2) == 0){
+                        aStep2 = 1;
+                    }else{
+                        aStep2 = -1;
+                    }
+                    it->_current_point[0] += aStep2;
+                    if(it->is_zero()){
+                        cout << "youpi only after " << walk_number2 << endl;
+                        cout << 100.0 * (1.0 * walk_number2) / MAX_TRY_BEFORE_GIVEUP << endl;
+                        return 0;
+                    }
+                    
+                    it->print_point();
+                    cout << " " << walk_number2 << endl;
+                }
+                cout << "FAILED NEW";
+            }
+
             int aStep = 0;
-            if (std::rand() % 2 == 0){
+            if ( (std::rand() % 2) == 0){
                 aStep = 1;
             }else{
                 aStep = -1;
             }
 
             //go +1 or -1 on a rdm direction
-            int random_index = distr_index(gen);
-            it->_current_point[random_index] += aStep;
+            
+            unsigned int random_index = distr_index(gen);
+            //unsigned int random_index = (std::rand() % 2);
+
+            it->_current_point[0] += aStep;
             if ( MODULO > 0 && random_index == (DIMENSION-1)) {
-                it->_current_point[random_index] = (it->_current_point[random_index] + MODULO ) % MODULO;
+                it->_current_point[random_index] = ((it->_current_point[random_index] + MODULO ) % MODULO);
             }
+            
 
             //erase the point if it went back to zero
             if(it->is_zero()){
-                std::cout << "i = " << i << " going to erase ";
-                it->print_point();
+                //std::cout << "i = " << i << " going to erase "; it->print_point();
                 global_vector.erase(it);
                 went_back_to_start_count++;
+                if (walk_number + 1 > max_steps_before_going_back){
+                    max_steps_before_going_back = walk_number + 1;
+                }
             }else{
                 ++it;
             }
+            keep_index++;
         }
     }
 
@@ -122,4 +174,5 @@ int main()
     std::cout << "failure_count " << failure_count << endl;
     std::cout << "max_steps_before_going_back " << max_steps_before_going_back << endl;
     
+    return 0;
 }

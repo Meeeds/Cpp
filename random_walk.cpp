@@ -34,9 +34,9 @@ int main()
 {
     //int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<int>::max();
     int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<int>::max();;
-    int DIMENSION = 3;
+    int DIMENSION = 2;
     int NUMBER_OF_TRY = 1000;
-    int MODULO = 3;
+    int MODULO = 0;
     cout << "MAX_TRY_BEFORE_GIVEUP=" << MAX_TRY_BEFORE_GIVEUP << endl;
     cout << "DIMENSION=" << DIMENSION << endl;
     cout << "NUMBER_OF_TRY=" << NUMBER_OF_TRY << endl;
@@ -61,7 +61,7 @@ int main()
     int went_back_to_start_count = 0;
     int failure_count = 0;
     int max_steps_before_going_back = 0;
-    vector<int> steps_it_failed;
+    vector<int> steps_it_went_to_zero;
     for(int i=0;  i < NUMBER_OF_TRY; ++i){
         
         int percent = (100 * i) / NUMBER_OF_TRY;
@@ -118,7 +118,7 @@ int main()
             if (went_back_to_start) {
                 cout << " went_back_to_start loop " << i << " after " << j+1 << " steps " << endl;
                 went_back_to_start_count++;
-                steps_it_failed.push_back(j+1);
+                steps_it_went_to_zero.push_back(j+1);
                 if (j+1 > max_steps_before_going_back){
                     max_steps_before_going_back = j+1;
                 }
@@ -128,19 +128,15 @@ int main()
                 cout << " FAILED " << i << " ";
                 print_point(current_point);
             }
-            /*stop if we cannot go back but too time consuming
-            else if (no_need_to_to_continue(current_point, j, MAX_TRY_BEFORE_GIVEUP)){
-                break;
-            }*/
         }
     }
 
-    std::sort (steps_it_failed.begin(), steps_it_failed.end());
+    std::sort (steps_it_went_to_zero.begin(), steps_it_went_to_zero.end());
     std::cout << "went_back_to_start_count " << went_back_to_start_count << endl;
     std::cout << "failure_count " << failure_count << endl;
     std::cout << "max_steps_before_going_back " << max_steps_before_going_back << endl;
-    cout << "steps_it_failed = [ ";
-    for (auto const &here: steps_it_failed) {
+    cout << "steps_it_went_to_zero = [ ";
+    for (auto const &here: steps_it_went_to_zero) {
         cout << here << ", ";
     }
     cout << " ]" << endl;

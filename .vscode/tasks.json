@@ -33,7 +33,7 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}_R3.exe"
+                "${fileDirname}\\${fileBasenameNoExtension}_D3Z2.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"
