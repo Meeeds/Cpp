@@ -61,7 +61,7 @@ int main()
     int went_back_to_start_count = 0;
     int failure_count = 0;
     int max_steps_before_going_back = 0;
-    vector<int> steps_it_went_to_zero;
+    vector<unsigned int> steps_it_went_to_zero;
     for(int i=0;  i < NUMBER_OF_RDM_WALKS; ++i){
         
         int percent = (100 * i) / NUMBER_OF_RDM_WALKS;

@@ -81,6 +81,8 @@ int main()
 
     //fill the vector with the dimension size and number of try
     vector<Points> global_vector;
+
+
     for(int i=0;  i < NUMBER_OF_RDM_WALKS; ++i){
         global_vector.push_back(Points(DIMENSION));
     }
@@ -92,7 +94,7 @@ int main()
     //counters
     int went_back_to_start_count = 0;
     int failure_count = 0;
-    int max_steps_before_going_back = 0;
+    unsigned int max_steps_before_going_back = 0;
     for(unsigned int walk_number=0;  walk_number < MAX_TRY_BEFORE_GIVEUP; ++walk_number){
         
         //just some progress bar
