@@ -34,7 +34,7 @@ int main()
 {
     //int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<int>::max();
     unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();;
-    int DIMENSION = 2;
+    int DIMENSION = 1;
     int NUMBER_OF_RDM_WALKS = 1000;
     int MODULO = 0;
     cout << "MAX_TRY_BEFORE_GIVEUP=" << MAX_TRY_BEFORE_GIVEUP << endl;

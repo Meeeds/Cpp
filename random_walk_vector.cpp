@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <chrono>
-  
+#include <cmath>
 
 
 using namespace std;
@@ -61,10 +61,11 @@ int main()
     typedef std::chrono::high_resolution_clock myclock;
     myclock::time_point beginning = myclock::now();
 
+    //unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();
     unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();
     //int MAX_TRY_BEFORE_GIVEUP = 10000;
     int DIMENSION = 2;
-    int NUMBER_OF_RDM_WALKS = 100;
+    int NUMBER_OF_RDM_WALKS = 1000;
     int MODULO = 0;
 
     std::random_device rd; // obtain a random number from hardware
@@ -101,7 +102,7 @@ int main()
             float failures = (100.0 * global_vector.size() ) / NUMBER_OF_RDM_WALKS;
             std::cout << "FAILURES " << std::fixed << setprecision(2) << failures << "%" 
                 << " Global progress:  " << setfill(' ') << setw(2) << percent << "%" << " steps done: " << walk_number << endl;
-            print_global_vector(global_vector);
+            //print_global_vector(global_vector);
             // reset the seed
             gen.seed((myclock::now() - beginning).count()); // remove to have deterministic code 
             if(nextPrint>2){
@@ -154,7 +155,7 @@ int main()
 
     failure_count=global_vector.size();
     std::cout << "went_back_to_start_count " << went_back_to_start_count << endl;
-    std::cout << "failure_count " << failure_count << endl;
+    std::cout << "failure_count " << failure_count << "="<< 100.0* failure_count / NUMBER_OF_RDM_WALKS << "%" << endl;
     std::cout << "max_steps_before_going_back " << max_steps_before_going_back << endl;
     
     return 0;
