@@ -65,7 +65,7 @@ class Points {
                cout << "," ;
             }
         }
-        cout << ")" ; 
+        cout << "," << _take_off << ")" ; 
     }
 
     vector<int> _current_point;
@@ -120,8 +120,6 @@ int main()
     int went_back_to_start_count = 0;
     int failure_count = 0;
     unsigned int max_steps_before_going_back = 0;
-    int success_x = 0;
-    int success_y = 0;
     for(unsigned int walk_number=0;  walk_number < MAX_TRY_BEFORE_GIVEUP; ++walk_number){
         
         //just some progress bar
@@ -144,7 +142,7 @@ int main()
         //print_global_vector(global_vector);
 
         //go one step for each point in the global vector
-        if(global_vector.size()==0){
+        if(global_vector.empty()){
             break;
         }
         for (auto it = global_vector.begin(); it != global_vector.end(); ){           
@@ -170,7 +168,7 @@ int main()
             it->set_take_off();
 
             // erase the point if it went back to zero, chose one of the if you prefer
-            // if(it->is_zero()){
+            //if(it->is_zero()){
             if(it->_take_off && it->one_is_zero()){
                 //std::cout <<  " going to erase " ; it->print_point(); cout  << endl;
                 it = global_vector.erase(it);
