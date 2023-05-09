@@ -5,6 +5,9 @@
 #include <limits>
 #include <algorithm>
 #include <iomanip>
+#include <chrono>
+  
+
 
 using namespace std;
 
@@ -54,13 +57,21 @@ void print_global_vector(const vector<Points>& aGlobal_vector ){
 
 int main()
 {
+
+    typedef std::chrono::high_resolution_clock myclock;
+    myclock::time_point beginning = myclock::now();
+
     unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();
     //int MAX_TRY_BEFORE_GIVEUP = 10000;
-    int DIMENSION = 1;
-    int NUMBER_OF_RDM_WALKS = 1000;
+    int DIMENSION = 2;
+    int NUMBER_OF_RDM_WALKS = 100;
     int MODULO = 0;
 
-    std::srand(std::time(nullptr)); 
+    std::random_device rd; // obtain a random number from hardware
+    std::mt19937 gen(rd()); // seed the generator
+    //std::mt19937 gen; // to have deterministic code 
+    std::uniform_int_distribution<> distr_index(0, DIMENSION-1); // for index random
+    std::uniform_int_distribution<> distr_step(0, 1); // define step random
 
     cout << "MAX_TRY_BEFORE_GIVEUP=" << MAX_TRY_BEFORE_GIVEUP << endl;
     cout << "DIMENSION=" << DIMENSION << endl; 
@@ -83,6 +94,7 @@ int main()
     int max_steps_before_going_back = 0;
     for(unsigned int walk_number=0;  walk_number < MAX_TRY_BEFORE_GIVEUP; ++walk_number){
         
+        //just some progress bar
         double percent = 100*( (double) walk_number / MAX_TRY_BEFORE_GIVEUP);
         if (percent >= nextPrint)
         {
@@ -90,6 +102,8 @@ int main()
             std::cout << "FAILURES " << std::fixed << setprecision(2) << failures << "%" 
                 << " Global progress:  " << setfill(' ') << setw(2) << percent << "%" << " steps done: " << walk_number << endl;
             print_global_vector(global_vector);
+            // reset the seed
+            gen.seed((myclock::now() - beginning).count()); // remove to have deterministic code 
             if(nextPrint>2){
                 nextPrint += 10*step;
             }else{
@@ -100,40 +114,14 @@ int main()
         //print_global_vector(global_vector);
 
         //go one step for each point in the global vector
-        int keep_index = 0;
         if(global_vector.size()==0){
             break;
         }
         for (auto it = global_vector.begin(); it != global_vector.end(); ){           
+            
             //go +1 or -1 ?
-
-            if(percent > 50){
-                it->print_point();
-                cout << "still not at zero ? try something else" << endl;
-                unsigned int walk_number2=0;
-                for(walk_number2=0;  walk_number2 < MAX_TRY_BEFORE_GIVEUP; ++walk_number2){
-                    int aStep2 = 0;
-                    if ( (std::rand() % 2) == 0){
-                        aStep2 = 1;
-                    }else{
-                        aStep2 = -1;
-                    }
-                    it->_current_point[0] += aStep2;
-                    if(it->is_zero()){
-                        cout << "youpi only after " << walk_number2 << endl;
-                        cout << 100.0 * (1.0 * walk_number2) / MAX_TRY_BEFORE_GIVEUP << endl;
-                        return 0;
-                    }
-                    if (walk_number2 % 99 == 0){
-                        it->print_point();
-                        cout << " " << walk_number2 << endl;
-                    }
-                }
-                cout << "FAILED NEW";
-            }
-
             int aStep = 0;
-            if ( (std::rand() % 2) == 0){
+            if ( distr_step(gen) == 0){
                 aStep = 1;
             }else{
                 aStep = -1;
@@ -141,10 +129,10 @@ int main()
 
             //go +1 or -1 on a rdm direction
             
-            const unsigned int random_index = 0;
-            //unsigned int random_index = (std::rand() % 2);
+            //const unsigned int random_index = 0;
+            const unsigned int random_index = distr_index(gen);
 
-            it->_current_point[0] += aStep;
+            it->_current_point[random_index] += aStep;
             if ( MODULO > 0 && random_index == (DIMENSION-1)) {
                 it->_current_point[random_index] = ((it->_current_point[random_index] + MODULO ) % MODULO);
             }
@@ -161,7 +149,6 @@ int main()
             }else{
                 ++it;
             }
-            keep_index++;
         }
     }
 

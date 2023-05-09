@@ -29,7 +29,6 @@
             "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
             "args": [
                 "-O2",
-                "-fdiagnostics-color=always",
                 "${file}",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}_new.exe"

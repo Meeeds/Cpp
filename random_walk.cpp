@@ -33,7 +33,7 @@ bool no_need_to_to_continue(vector<int> current_point, int index, int maxIndex) 
 int main()
 {
     //int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<int>::max();
-    int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<int>::max();;
+    unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();;
     int DIMENSION = 2;
     int NUMBER_OF_TRY = 1000;
     int MODULO = 0;
@@ -45,7 +45,7 @@ int main()
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
     std::uniform_int_distribution<> distr_index(0, DIMENSION-1); // define the range
-
+    std::uniform_int_distribution<> distr_step(0, 1); // define step random
 
     //fill the vector with the dimension
     vector<int> current_point;
@@ -78,12 +78,12 @@ int main()
         }
 
         //to print each walk progress
-        int walk_step = 1;
-        int walk_nextPrint = walk_step;
+        double walk_step = 1.0;
+        double walk_nextPrint = walk_step;
         //random walk
-        for(int j=0;  j < MAX_TRY_BEFORE_GIVEUP; ++j){
+        for(unsigned int j=0;  j < MAX_TRY_BEFORE_GIVEUP; ++j){
             
-            int walk_percent = 100*( (float) j / MAX_TRY_BEFORE_GIVEUP);
+            double walk_percent = 100*( (double) j / MAX_TRY_BEFORE_GIVEUP);
             if (walk_percent >= walk_nextPrint)
             {
                 std::cout << "\rWalk: " << std::string(walk_percent/5, '|') << walk_percent << "%";
@@ -93,7 +93,7 @@ int main()
 
             //go +1 or -1 ?
             int aStep = 0;
-            if (std::rand() % 2 == 0){
+            if ( distr_step(gen) == 0){
                 aStep = 1;
             }else{
                 aStep = -1;
