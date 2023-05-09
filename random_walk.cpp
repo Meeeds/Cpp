@@ -35,16 +35,16 @@ int main()
     //int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<int>::max();
     unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();;
     int DIMENSION = 2;
-    int NUMBER_OF_TRY = 1000;
+    int NUMBER_OF_RDM_WALKS = 1000;
     int MODULO = 0;
     cout << "MAX_TRY_BEFORE_GIVEUP=" << MAX_TRY_BEFORE_GIVEUP << endl;
     cout << "DIMENSION=" << DIMENSION << endl;
-    cout << "NUMBER_OF_TRY=" << NUMBER_OF_TRY << endl;
+    cout << "NUMBER_OF_RDM_WALKS=" << NUMBER_OF_RDM_WALKS << endl;
     cout << "MODULO=" << MODULO << endl;
 
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
-    std::uniform_int_distribution<> distr_index(0, DIMENSION-1); // define the range
+    std::uniform_int_distribution<> distr_index(0, DIMENSION-1); // for index random
     std::uniform_int_distribution<> distr_step(0, 1); // define step random
 
     //fill the vector with the dimension
@@ -62,9 +62,9 @@ int main()
     int failure_count = 0;
     int max_steps_before_going_back = 0;
     vector<int> steps_it_went_to_zero;
-    for(int i=0;  i < NUMBER_OF_TRY; ++i){
+    for(int i=0;  i < NUMBER_OF_RDM_WALKS; ++i){
         
-        int percent = (100 * i) / NUMBER_OF_TRY;
+        int percent = (100 * i) / NUMBER_OF_RDM_WALKS;
         if (percent >= nextPrint)
         {
             std::cout << "\rGlobal progress:  " << std::string(percent/5, '|') << percent << "%" << endl;
