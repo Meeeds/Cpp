@@ -33,6 +33,30 @@ class Points {
         return true;
     }
 
+    void set_take_off(){
+        //already take off, keep it
+        if (_take_off) {
+            return;
+        }
+        bool take_off = true;
+        for(int k=0;  k < _current_point.size(); ++k){
+            if(_current_point[k]==0){
+                take_off = false;
+                break;
+            }
+        }
+        _take_off = take_off;
+    } 
+
+    bool one_is_zero(){
+        for(int k=0;  k < _current_point.size(); ++k){
+            if(_current_point[k]==0){
+                return true;
+            }
+        }
+        return false;
+    }
+
     void print_point() const {
         cout << "(" ; 
         for(int l=0;  l < _current_point.size(); ++l){
@@ -45,6 +69,7 @@ class Points {
     }
 
     vector<int> _current_point;
+    bool _take_off = false ;
 };
 
 void print_global_vector(const vector<Points>& aGlobal_vector ){
@@ -62,10 +87,10 @@ int main()
     myclock::time_point beginning = myclock::now();
 
     //unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();
-    unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();
+    unsigned int MAX_TRY_BEFORE_GIVEUP = sqrt(std::numeric_limits<unsigned int>::max());
     //int MAX_TRY_BEFORE_GIVEUP = 10000;
     int DIMENSION = 2;
-    int NUMBER_OF_RDM_WALKS = 1000;
+    int NUMBER_OF_RDM_WALKS = 100000;
     int MODULO = 0;
 
     std::random_device rd; // obtain a random number from hardware
@@ -95,6 +120,8 @@ int main()
     int went_back_to_start_count = 0;
     int failure_count = 0;
     unsigned int max_steps_before_going_back = 0;
+    int success_x = 0;
+    int success_y = 0;
     for(unsigned int walk_number=0;  walk_number < MAX_TRY_BEFORE_GIVEUP; ++walk_number){
         
         //just some progress bar
@@ -104,9 +131,9 @@ int main()
             float failures = (100.0 * global_vector.size() ) / NUMBER_OF_RDM_WALKS;
             std::cout << "FAILURES " << std::fixed << setprecision(2) << failures << "%" 
                 << " Global progress:  " << setfill(' ') << setw(2) << percent << "%" << " steps done: " << walk_number << endl;
-            //print_global_vector(global_vector);
+            print_global_vector(global_vector);
             // reset the seed
-            gen.seed((myclock::now() - beginning).count()); // remove to have deterministic code 
+            // gen.seed((myclock::now() - beginning).count()); // remove to have deterministic code 
             if(nextPrint>2){
                 nextPrint += 10*step;
             }else{
@@ -140,10 +167,12 @@ int main()
                 it->_current_point[random_index] = ((it->_current_point[random_index] + MODULO ) % MODULO);
             }
             
+            it->set_take_off();
 
-            //erase the point if it went back to zero
-            if(it->is_zero()){
-                //std::cout << "i = " << i << " going to erase "; it->print_point();
+            // erase the point if it went back to zero, chose one of the if you prefer
+            // if(it->is_zero()){
+            if(it->_take_off && it->one_is_zero()){
+                //std::cout <<  " going to erase " ; it->print_point(); cout  << endl;
                 it = global_vector.erase(it);
                 went_back_to_start_count++;
                 if (walk_number + 1 > max_steps_before_going_back){

@@ -31,7 +31,7 @@
                 "-O2",
                 "${file}",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}_D2.exe"
+                "${fileDirname}\\${fileBasenameNoExtension}_D2D1.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"
