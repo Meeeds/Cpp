@@ -165,11 +165,11 @@ int main()
                 it->_current_point[random_index] = ((it->_current_point[random_index] + MODULO ) % MODULO);
             }
             
-            it->set_take_off();
+            //it->set_take_off();
 
             // erase the point if it went back to zero, chose one of the if you prefer
-            //if(it->is_zero()){
-            if(it->_take_off && it->one_is_zero()){
+            if(it->is_zero()){
+            //if(it->_take_off && it->one_is_zero()){
                 //std::cout <<  " going to erase " ; it->print_point(); cout  << endl;
                 it = global_vector.erase(it);
                 went_back_to_start_count++;

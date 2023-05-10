@@ -62,6 +62,7 @@
         "chrono": "cpp",
         "forward_list": "cpp",
         "optional": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "numeric": "cpp"
     }
 }
