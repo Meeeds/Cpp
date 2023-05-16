@@ -63,6 +63,7 @@
         "forward_list": "cpp",
         "optional": "cpp",
         "sstream": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "deque": "cpp"
     }
 }

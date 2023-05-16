@@ -8,6 +8,7 @@
 #include <numeric>
 #include <atomic>
 #include <iomanip>
+#include <deque>
 
 using namespace std;
 
@@ -31,7 +32,7 @@ class Progress {
 
 void do_random_walk(const int thread_id, const int size, const int dimension, 
                     const unsigned int max_try_before_giveup, const int MODULO, int& oWent_back_to_start,
-                    std::atomic<Progress*>* progress)
+                    std::atomic<int>& progress)
 {
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
@@ -56,10 +57,8 @@ void do_random_walk(const int thread_id, const int size, const int dimension,
         if (percent >= nextPrint)
         {   
             //std::cout << "Thread progress(" << thread_id << "):  " << std::string(percent/5, '|') << percent << "%" << std::endl;
-            Progress* aProgress = progress->load();
-            aProgress->_percent=percent;
-            progress->store(aProgress);
-            progress->notify_all();
+            progress = percent;
+            progress.notify_one();
             nextPrint += step;
         }
 
@@ -97,40 +96,26 @@ void do_random_walk(const int thread_id, const int size, const int dimension,
 
             if (went_back_to_start) {
                 oWent_back_to_start++;
-                /*Progress aProgress = progress->load();
-                aProgress._went_back_to_start++;
-                progress->store(aProgress);*/
                 break;
             }
         }
     }
 
-    Progress* aProgress = progress->load();
-    aProgress->_percent = 100;
-    progress->store(aProgress);
+    progress=100;
 
 }
 
-void monitor_progress(std::vector<std::atomic<Progress*>*>* progress, int size){
+void monitor_progress(std::deque<std::atomic<int>>& progress, int size){
     bool keep = true;
     float barWidth = 15.0;
     while (keep){
-        chrono::milliseconds dura( 2000 );
+        chrono::milliseconds dura( 100 );
         this_thread::sleep_for(dura); // Sleeps for a bit
         keep = false;
-        cout << "\r";
+        cout << "\r";      
 
-        /*int total_success = 0;
-        for (int i = 0; i < progress->size(); i++) {
-            total_success+=(*progress)[i]->load()->_went_back_to_start;
-        }
-
-        cout << "[F=" << std::fixed << setprecision(1) << std::setw(4) << (100.0*(size-total_success))/size << "%]" ;*/
-
-        
-
-        for (int i = 0; i < progress->size(); i++) {
-            int l_progress = (*progress)[i]->load()->_percent;
+        for (int i = 0; i < progress.size(); i++) {
+            int l_progress = progress[i];
             cout << " T#" << i << ":[";
             int pos = l_progress * (barWidth / 100);
             for (int w = 0; w < barWidth; ++w) {
@@ -155,11 +140,11 @@ void monitor_progress(std::vector<std::atomic<Progress*>*>* progress, int size){
 int main()
 {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max();
+    unsigned int MAX_TRY_BEFORE_GIVEUP = std::numeric_limits<unsigned int>::max()   ;
     int DIMENSION = 2;
     int NUMBER_OF_RDM_WALKS = 100;
     int MODULO = 0;
-    int THREAD_NUMBER = 4;
+    int THREAD_NUMBER = 10;
     cout << "MAX_TRY_BEFORE_GIVEUP=" << MAX_TRY_BEFORE_GIVEUP << endl;
     cout << "DIMENSION=" << DIMENSION << endl;
     cout << "NUMBER_OF_RDM_WALKS=" << NUMBER_OF_RDM_WALKS << endl;
@@ -174,16 +159,18 @@ int main()
     std::vector<std::thread> threads(THREAD_NUMBER);
     std::vector<int> went_back_count(THREAD_NUMBER);
 
-    std::vector<std::atomic<Progress*>*> cProgress;
+    std::deque<std::atomic<int>> cProgress;
     
     // spawn n threads:
     for (int i = 0; i < THREAD_NUMBER; i++) {
         went_back_count[i] = 0;
-        cProgress.emplace_back(new std::atomic<Progress*>(new Progress()));
-        threads[i] = std::thread(do_random_walk, i, NUMBER_OF_RDM_WALKS/THREAD_NUMBER, DIMENSION, MAX_TRY_BEFORE_GIVEUP, MODULO, std::ref(went_back_count[i]),  cProgress[i] );
+        cProgress.emplace_back(0);
+        threads[i] = std::thread(do_random_walk, i, NUMBER_OF_RDM_WALKS/THREAD_NUMBER, DIMENSION, MAX_TRY_BEFORE_GIVEUP, MODULO, std::ref(went_back_count[i]),  std::ref(cProgress[i]) );
     }
 
-    monitor_progress(&cProgress, REAL_NUMBER_OF_RDM_WALKS);
+
+    
+    monitor_progress(std::ref(cProgress), REAL_NUMBER_OF_RDM_WALKS);
 
     for (int i = 0; i < THREAD_NUMBER; i++) {
         threads[i].join();
